@@ -1,0 +1,20 @@
+import pandas as pd
+# Read the data from the file
+df = pd.read_csv('work_schedule.csv')
+# a) Find employees who have worked for 7 consecutive days
+consecutive_days = df.groupby('Employee').agg({'Date': 'nunique'})
+consecutive_days = consecutive_days[consecutive_days['Date'] == 7]
+print('Employees who have worked for 7 consecutive days:')
+print(consecutive_days)
+# b) Find employees who have less than 10 hours between shifts but greater than 1 hour
+time_between_shifts = df.groupby('Employee').agg({'StartTime': 'min', 'EndTime': 'max'})
+time_between_shifts['Time Between Shifts'] = time_between_shifts['EndTime'] - time_between_shifts['StartTime']
+time_between_shifts = time_between_shifts[(time_between_shifts['Time Between Shifts'] < pd.Timedelta(hours=10)) & (time_between_shifts['Time Between Shifts'] > pd.Timedelta(hours=1))]
+print('Employees who have less than 10 hours between shifts but greater than 1 hour:')
+print(time_between_shifts)
+# c) Find employees who have worked for more than 14 hours in a single shift
+single_shift_hours = df.groupby('Employee').agg({'StartTime': 'min', 'EndTime': 'max'})
+single_shift_hours['Total Hours Worked'] = single_shift_hours['EndTime'] - single_shift_hours['StartTime']
+single_shift_hours = single_shift_hours[single_shift_hours['Total Hours Worked'] > pd.Timedelta(hours=14)]
+print('Employees who have worked for more than 14 hours in a single shift:')
+print(single_shift_hours)
